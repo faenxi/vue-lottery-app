@@ -3,7 +3,8 @@ import { defineStore } from 'pinia'
 import { HttpError } from '@/api/http-client'
 import { ServiceProvider } from '@/services/service-provider'
 import type { CreateUserDto, UpdateUserDto, User } from '@/types/user'
-import { fullName, getErrorMessage } from '@/utils/error'
+import { getErrorMessage } from '@/shared/lib'
+import { fullName } from '@/entities/user'
 
 export const PAGE_SIZE = 10
 
