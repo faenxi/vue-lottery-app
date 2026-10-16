@@ -12,14 +12,5 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
     },
-    css: {
-      preprocessorOptions: {
-        scss: {
-          // Bootstrap 5 ще використовує @import, тому приховуємо зайві попередження Sass
-          quietDeps: true,
-          silenceDeprecations: ['import', 'global-builtin', 'color-functions', 'mixed-decls'],
-        },
-      },
-    },
   }
 })

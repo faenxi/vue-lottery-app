@@ -4,7 +4,8 @@ import App from './App.vue'
 import router from './providers/router'
 import { setupAuth } from './providers/auth'
 import { registerServices } from './providers/services'
-import 'bootstrap-icons/font/bootstrap-icons.css'
+import { setupUi } from './providers/ui'
+import 'primeicons/primeicons.css'
 import './styles/main.scss'
 
 const app = createApp(App)
@@ -15,6 +16,7 @@ registerServices()
 // Pinia має бути підключена до роутера, бо navigation guard використовує стор
 app.use(createPinia())
 setupAuth(router)
+setupUi(app)
 app.use(router)
 
 app.mount('#app')

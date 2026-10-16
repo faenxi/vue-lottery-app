@@ -1,17 +1,18 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { useSessionStore } from '@/entities/session'
 import AppLogo from './AppLogo.vue'
 import AppNavigation from './AppNavigation.vue'
 
-const session = useSessionStore()
+const { user } = storeToRefs(useSessionStore())
 </script>
 
 <template>
-  <header class="app-header bg-white border-bottom">
-    <div class="container app-header__inner">
+  <header class="app-header">
+    <div class="app-header__inner">
       <AppLogo />
-      <div class="d-flex align-items-center gap-3 flex-wrap">
-        <span v-if="session.user" class="text-body-secondary small">Hi, {{ session.user.firstName }}</span>
+      <div class="app-header__right">
+        <span v-if="user" class="app-header__hello">Hi, {{ user.firstName }}</span>
         <AppNavigation />
       </div>
     </div>
@@ -19,6 +20,11 @@ const session = useSessionStore()
 </template>
 
 <style scoped lang="scss">
+.app-header {
+  background: var(--app-header-bg);
+  border-bottom: 1px solid var(--p-content-border-color);
+}
+
 .app-header__inner {
   display: flex;
   flex-wrap: wrap;
@@ -26,6 +32,19 @@ const session = useSessionStore()
   align-items: center;
   justify-content: space-between;
   max-width: 1000px;
-  padding-block: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin-inline: auto;
+}
+
+.app-header__right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.app-header__hello {
+  font-size: 0.85rem;
+  color: var(--p-text-muted-color);
 }
 </style>

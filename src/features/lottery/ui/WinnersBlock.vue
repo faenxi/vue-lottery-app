@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { BaseButton } from '@/shared/ui'
-import type { User } from '@/entities/user'
 import { fullName } from '@/entities/user'
+import type { User } from '@/entities/user'
+import { AppButton, AppCard } from '@/shared/ui'
 import WinnerItem from './WinnerItem.vue'
 
 defineProps<{
@@ -16,29 +16,38 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <section class="card mb-3">
-    <div class="card-body d-flex gap-3 align-items-start">
-      <div class="winners-field form-control flex-grow-1">
+  <AppCard>
+    <div class="winners">
+      <div class="winners__field">
         <WinnerItem
           v-for="winner in winners"
           :key="winner.id"
           :name="fullName(winner)"
           @remove="emit('remove-winner', winner.id)"
         />
-        <span v-if="winners.length === 0" class="text-body-secondary">Winners</span>
+        <span v-if="winners.length === 0" class="text-muted">Winners</span>
       </div>
-      <BaseButton :disabled="isDrawDisabled" @click="emit('draw')">New winner</BaseButton>
+      <AppButton label="New winner" :disabled="isDrawDisabled" @click="emit('draw')" />
     </div>
-  </section>
+  </AppCard>
 </template>
 
 <style scoped lang="scss">
-.winners-field {
+.winners {
   display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.winners__field {
+  display: flex;
+  flex: 1 1 auto;
   flex-wrap: wrap;
   gap: 0.4rem;
   align-items: center;
   min-height: 2.4rem;
-  background: #fff;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: var(--p-border-radius-md);
 }
 </style>

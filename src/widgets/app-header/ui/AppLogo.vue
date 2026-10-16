@@ -1,6 +1,6 @@
 <template>
   <RouterLink :to="{ name: 'home' }" class="app-logo" aria-label="Vue Lottery, home">
-    <span class="app-logo__mark"><i class="bi bi-trophy-fill" /></span>
+    <span class="app-logo__mark"><i class="pi pi-trophy" /></span>
     <span class="app-logo__text">Vue Lottery</span>
   </RouterLink>
 </template>
@@ -12,8 +12,12 @@
   align-items: center;
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--bs-body-color);
+  color: var(--p-text-color);
   text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+  }
 }
 
 .app-logo__mark {
@@ -23,8 +27,8 @@
   width: 2rem;
   height: 2rem;
   font-size: 1rem;
-  color: #fff;
-  background: var(--bs-primary);
+  color: var(--p-primary-contrast-color);
+  background: var(--p-primary-color);
   border-radius: 0.5rem;
 }
 </style>

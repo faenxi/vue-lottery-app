@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { AppSearchInput } from '@/shared/ui'
 
 const DEBOUNCE_MS = 300
 
@@ -40,8 +41,5 @@ watch(query, (value, _oldValue, onCleanup) => {
 </script>
 
 <template>
-  <div class="input-group">
-    <span class="input-group-text"><i class="bi bi-search" /></span>
-    <input v-model="query" type="search" class="form-control" placeholder="Search by name" aria-label="Search by name" />
-  </div>
+  <AppSearchInput v-model="query" placeholder="Search by name" aria-label="Search by name" />
 </template>

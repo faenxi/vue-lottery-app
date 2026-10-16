@@ -1,20 +1,35 @@
 <script setup lang="ts">
 import { AppLogo } from '@/widgets/app-header'
+import { AppCard } from '@/shared/ui'
 </script>
 
 <template>
-  <div class="auth-layout d-flex flex-column align-items-center justify-content-center min-vh-100 px-3">
-    <AppLogo class="mb-4" />
-    <main class="auth-layout__card card w-100">
-      <div class="card-body p-4">
+  <div class="auth-layout">
+    <AppLogo class="auth-layout__logo" />
+    <main class="auth-layout__main">
+      <AppCard>
         <slot />
-      </div>
+      </AppCard>
     </main>
   </div>
 </template>
 
 <style scoped lang="scss">
-.auth-layout__card {
+.auth-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.auth-layout__logo {
+  margin-bottom: 1.5rem;
+}
+
+.auth-layout__main {
+  width: 100%;
   max-width: 420px;
 }
 </style>

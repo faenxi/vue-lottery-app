@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { useRouter, type RouteLocationRaw } from 'vue-router'
-import { BaseButton } from '@/shared/ui'
+import { storeToRefs } from 'pinia'
+import type { RouteLocationRaw } from 'vue-router'
 import { useSessionStore } from '@/entities/session'
+import { LogoutButton } from '@/features/auth'
 
 interface NavItem {
   label: string
@@ -16,48 +17,59 @@ const items: NavItem[] = [
   { label: 'Users', to: { name: 'users' } },
 ]
 
-const session = useSessionStore()
-const router = useRouter()
-
-function logout(): void {
-  session.logout()
-  void router.push({ name: 'login' })
-}
+const { isAuthenticated } = storeToRefs(useSessionStore())
 </script>
 
 <template>
   <nav aria-label="Main navigation">
-    <ul class="nav align-items-center">
-      <li v-for="item in items" :key="item.label" class="nav-item">
-        <RouterLink :to="item.to" class="nav-link" :active-class="item.exact ? '' : 'is-active'" exact-active-class="is-active">
+    <ul class="nav">
+      <li v-for="item in items" :key="item.label">
+        <RouterLink :to="item.to" class="nav__link" :active-class="item.exact ? '' : 'is-active'" exact-active-class="is-active">
           {{ item.label }}
         </RouterLink>
       </li>
-      <li v-if="!session.isAuthenticated" class="nav-item">
-        <RouterLink :to="{ name: 'login' }" class="nav-link" active-class="is-active">Login</RouterLink>
+      <li v-if="!isAuthenticated">
+        <RouterLink :to="{ name: 'login' }" class="nav__link" active-class="is-active">Login</RouterLink>
       </li>
-      <li v-else class="nav-item ms-2">
-        <BaseButton variant="outline-primary" class="btn-sm" @click="logout">Logout</BaseButton>
+      <li v-else class="nav__action">
+        <LogoutButton />
       </li>
     </ul>
   </nav>
 </template>
 
 <style scoped lang="scss">
-.nav-link {
-  color: var(--bs-body-color);
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.nav__action {
+  margin-left: 0.5rem;
+}
+
+.nav__link {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  color: var(--p-text-color);
+  text-decoration: none;
   border-bottom: 2px solid transparent;
-  border-radius: 0;
 
   &:hover {
-    color: var(--bs-primary);
+    color: var(--p-primary-color);
+    text-decoration: none;
   }
 
   // Активний пункт меню
   &.is-active {
     font-weight: 600;
-    color: var(--bs-primary);
-    border-bottom-color: var(--bs-primary);
+    color: var(--p-primary-color);
+    border-bottom-color: var(--p-primary-color);
   }
 }
 </style>

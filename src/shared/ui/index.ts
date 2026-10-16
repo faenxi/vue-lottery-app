@@ -1,7 +1,9 @@
 // Обгортки над UI-бібліотекою (PrimeVue). Решта застосунку імпортує лише їх.
 export { default as AppButton } from './AppButton/AppButton.vue'
+export { default as AppLinkButton } from './AppLinkButton/AppLinkButton.vue'
 export { default as AppInput } from './AppInput/AppInput.vue'
 export { default as AppSelect } from './AppSelect/AppSelect.vue'
+export { default as AppSearchInput } from './AppSearchInput/AppSearchInput.vue'
 export { default as AppTable } from './AppTable/AppTable.vue'
 export { default as AppConfirmDialog } from './AppConfirmDialog/AppConfirmDialog.vue'
 export { default as AppModal } from './AppModal/AppModal.vue'
@@ -13,10 +15,3 @@ export { default as AppToast } from './AppToast/AppToast.vue'
 export { useNotify } from './AppToast/useNotify'
 export type { AppTableColumn } from './AppTable/types'
 export type { SelectOption } from './AppSelect/types'
-
-// Тимчасово: старі обгортки над Bootstrap, їх буде видалено після переходу на App*
-export { default as BaseButton } from './base/BaseButton.vue'
-export { default as BaseModal } from './base/BaseModal.vue'
-export { default as BasePagination } from './base/BasePagination.vue'
-export { default as FormInput } from './form/FormInput.vue'
-export { default as FormSelect } from './form/FormSelect.vue'

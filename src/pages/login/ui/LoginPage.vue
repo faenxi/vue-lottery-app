@@ -1,20 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useForm } from 'vee-validate'
 import { useRoute, useRouter } from 'vue-router'
-import { BaseButton, FormInput } from '@/shared/ui'
-import { useSessionStore } from '@/entities/session'
-import { getErrorMessage } from '@/shared/lib'
-import { loginSchema } from '@/features/auth'
+import { LoginForm } from '@/features/auth'
 
-const session = useSessionStore()
 const route = useRoute()
 const router = useRouter()
-
-const isSubmitting = ref(false)
-const submitError = ref<string | null>(null)
-
-const { handleSubmit } = useForm({ validationSchema: loginSchema })
 
 // Після логіну повертаємо на запитану сторінку (query-параметр redirect).
 // Приймаємо лише внутрішні адреси, щоб уникнути редіректу на чужий сайт.
@@ -24,33 +13,26 @@ function getRedirectTarget(): string {
   return isInternal ? redirect : '/users'
 }
 
-const onSubmit = handleSubmit(async (values) => {
-  isSubmitting.value = true
-  submitError.value = null
-  try {
-    await session.login(values)
-    await router.replace(getRedirectTarget())
-  } catch (e) {
-    submitError.value = getErrorMessage(e)
-  } finally {
-    isSubmitting.value = false
-  }
-})
+async function onLoggedIn(): Promise<void> {
+  await router.replace(getRedirectTarget())
+}
 </script>
 
 <template>
-  <h1 class="h4 mb-1">Login</h1>
-  <p class="text-body-secondary small mb-4">Test account: <code>emilys</code> / <code>emilyspass</code></p>
-
-  <form novalidate @submit.prevent="onSubmit">
-    <FormInput name="username" label="Username" placeholder="Enter username" autocomplete="username" />
-    <FormInput name="password" label="Password" type="password" placeholder="Enter password" autocomplete="current-password" />
-
-    <div v-if="submitError" class="alert alert-danger" role="alert">{{ submitError }}</div>
-
-    <BaseButton type="submit" class="w-100" :disabled="isSubmitting">
-      <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-1" aria-hidden="true" />
-      Login
-    </BaseButton>
-  </form>
+  <div>
+    <h1 class="login__title">Login</h1>
+    <p class="text-muted login__hint">Test account: <code>emilys</code> / <code>emilyspass</code></p>
+    <LoginForm @success="onLoggedIn" />
+  </div>
 </template>
+
+<style scoped lang="scss">
+.login__title {
+  font-size: 1.5rem;
+}
+
+.login__hint {
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+}
+</style>
