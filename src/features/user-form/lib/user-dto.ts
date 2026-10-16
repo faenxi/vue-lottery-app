@@ -1,4 +1,4 @@
-import type { CreateUserDto, UpdateUserDto } from '@/types/user'
+import type { CreateUserDto, UpdateUserDto } from '@/entities/user'
 import type { UserFormValues } from '../model/schemas'
 
 export function toCreateDto(values: UserFormValues): CreateUserDto {

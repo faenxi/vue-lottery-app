@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUsersStore } from '@/stores/users'
 import { useWinnersStore } from '@/features/lottery'
-import type { User } from '@/types/user'
+import type { User } from '@/entities/user'
 import { getErrorMessage } from '@/shared/lib'
 import { fullName } from '@/entities/user'
 

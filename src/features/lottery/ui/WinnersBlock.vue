@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { BaseButton } from '@/shared/ui'
-import type { User } from '@/types/user'
+import type { User } from '@/entities/user'
 import { fullName } from '@/entities/user'
 import WinnerItem from './WinnerItem.vue'
 

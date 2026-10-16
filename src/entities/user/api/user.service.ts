@@ -1,7 +1,6 @@
-import { http } from '@/api/http-client'
-import type { ListParams, Paginated } from '@/types/pagination'
-import type { CreateUserDto, UpdateUserDto, User } from '@/types/user'
-import type { Creatable, Deletable, Editable, Readable } from './interfaces'
+import { http } from '@/shared/api'
+import type { Creatable, Deletable, Editable, ListParams, Paginated, Readable } from '@/shared/api'
+import type { CreateUserDto, UpdateUserDto, User } from '../model/types'
 
 interface UsersResponse {
   users: User[]

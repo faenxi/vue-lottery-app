@@ -1,12 +1,13 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { HttpError } from '@/api/http-client'
-import { ServiceProvider } from '@/services/service-provider'
-import type { CreateUserDto, UpdateUserDto, User } from '@/types/user'
+import { HttpError, ServiceProvider } from '@/shared/api'
+import type { CreateUserDto, UpdateUserDto, User, UserService } from '@/entities/user'
 import { getErrorMessage } from '@/shared/lib'
 import { fullName } from '@/entities/user'
 
 export const PAGE_SIZE = 10
+
+const userService = () => ServiceProvider.get<UserService>('users')
 
 function matchesQuery(user: User, query: string): boolean {
   const q = query.trim().toLowerCase()
@@ -70,7 +71,7 @@ export const useUsersStore = defineStore('users', () => {
     currentQuery.value = q
 
     try {
-      const result = await ServiceProvider.users.getAll({
+      const result = await userService().getAll({
         limit: PAGE_SIZE,
         skip: (page - 1) * PAGE_SIZE,
         q,
@@ -92,12 +93,12 @@ export const useUsersStore = defineStore('users', () => {
     if (deletedUsers.value.some((user) => user.id === id)) {
       throw new HttpError(404, 'This user has been deleted.')
     }
-    const user = await ServiceProvider.users.getById(id)
+    const user = await userService().getById(id)
     return editedUsers.value[id] ?? user
   }
 
   async function create(dto: CreateUserDto): Promise<User> {
-    const response = await ServiceProvider.users.create(dto)
+    const response = await userService().create(dto)
     // DummyJSON щоразу повертає той самий id, тому гарантуємо унікальність локально
     const usedIds = new Set(createdUsers.value.map((user) => user.id))
     let id = response.id
@@ -117,7 +118,7 @@ export const useUsersStore = defineStore('users', () => {
       return updated
     }
 
-    const response = await ServiceProvider.users.update(id, dto)
+    const response = await userService().update(id, dto)
     const base = editedUsers.value[id] ?? serverItems.value.find((user) => user.id === id)
     const updated: User = { ...base, ...response, id }
     editedUsers.value = { ...editedUsers.value, [id]: updated }
@@ -131,7 +132,7 @@ export const useUsersStore = defineStore('users', () => {
       return
     }
 
-    const deleted = await ServiceProvider.users.delete(id)
+    const deleted = await userService().delete(id)
     const user = serverItems.value.find((item) => item.id === id) ?? deleted
     deletedUsers.value = [...deletedUsers.value, user]
     const remainingEdits = { ...editedUsers.value }

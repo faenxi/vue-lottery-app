@@ -1,7 +1,11 @@
-import { http } from '@/api/http-client'
-import type { AuthTokens, LoginCredentials, LoginResponse } from '@/types/auth'
-import type { User } from '@/types/user'
-import type { Authenticatable } from './interfaces'
+import { http } from '@/shared/api'
+import type { AuthTokens, AuthUser, LoginCredentials, LoginResponse } from '../model/types'
+
+export interface Authenticatable {
+  login(credentials: LoginCredentials): Promise<LoginResponse>
+  getCurrentUser(): Promise<AuthUser>
+  refresh(refreshToken: string): Promise<AuthTokens>
+}
 
 const EXPIRES_IN_MINS = Number(import.meta.env.VITE_TOKEN_EXPIRES_IN_MINS) || 60
 
@@ -13,8 +17,8 @@ export class AuthService implements Authenticatable {
     })
   }
 
-  getCurrentUser(): Promise<User> {
-    return http<User>('/auth/me', { auth: true })
+  getCurrentUser(): Promise<AuthUser> {
+    return http<AuthUser>('/auth/me', { auth: true })
   }
 
   refresh(refreshToken: string): Promise<AuthTokens> {

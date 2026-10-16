@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { UserForm, toUpdateDto } from '@/features/user-form'
 import { useUsersStore } from '@/stores/users'
-import type { User } from '@/types/user'
+import type { User } from '@/entities/user'
 import { getErrorMessage } from '@/shared/lib'
 import type { UserFormValues } from '@/features/user-form'
 

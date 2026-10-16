@@ -1,10 +1,11 @@
 import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
-import { ServiceProvider } from '@/services/service-provider'
-import type { AuthUser, LoginCredentials } from '@/types/auth'
-import type { User } from '@/types/user'
+import { ServiceProvider } from '@/shared/api'
+import type { AuthService, AuthUser, LoginCredentials } from '@/entities/session'
 
 const STORAGE_KEY = 'vue-lottery-auth'
+
+const authService = () => ServiceProvider.get<AuthService>('auth')
 
 interface PersistedSession {
   accessToken: string | null
@@ -29,7 +30,7 @@ function loadSession(): PersistedSession {
   }
 }
 
-function pickAuthUser(source: AuthUser | User): AuthUser {
+function pickAuthUser(source: AuthUser): AuthUser {
   const { id, username, email, firstName, lastName, gender, image } = source
   return { id, username, email, firstName, lastName, gender, image }
 }
@@ -66,7 +67,7 @@ export const useAuthStore = defineStore('auth', () => {
   )
 
   async function login(credentials: LoginCredentials): Promise<void> {
-    const response = await ServiceProvider.auth.login(credentials)
+    const response = await authService().login(credentials)
     accessToken.value = response.accessToken
     refreshToken.value = response.refreshToken
     user.value = pickAuthUser(response)
@@ -83,7 +84,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function fetchCurrentUser(): Promise<void> {
-    const me = await ServiceProvider.auth.getCurrentUser()
+    const me = await authService().getCurrentUser()
     user.value = pickAuthUser(me)
   }
 
@@ -94,7 +95,7 @@ export const useAuthStore = defineStore('auth', () => {
     const currentRefreshToken = refreshToken.value
     if (!currentRefreshToken) return Promise.resolve(null)
 
-    refreshPromise ??= ServiceProvider.auth
+    refreshPromise ??= authService()
       .refresh(currentRefreshToken)
       .then((tokens) => {
         accessToken.value = tokens.accessToken
