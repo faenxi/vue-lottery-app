@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import App from './App.vue'
 import router from './providers/router'
 import { setupAuth } from './providers/auth'
@@ -14,7 +15,9 @@ const app = createApp(App)
 registerServices()
 
 // Pinia має бути підключена до роутера, бо navigation guard використовує стор
-app.use(createPinia())
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+app.use(pinia)
 setupAuth(router)
 setupUi(app)
 app.use(router)

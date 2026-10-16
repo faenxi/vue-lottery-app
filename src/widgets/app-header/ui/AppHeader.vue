@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { useSessionStore } from '@/entities/session'
+import { ThemeSwitcher } from '@/features/theme-switcher'
 import AppLogo from './AppLogo.vue'
 import AppNavigation from './AppNavigation.vue'
 
@@ -14,6 +15,7 @@ const { user } = storeToRefs(useSessionStore())
       <div class="app-header__right">
         <span v-if="user" class="app-header__hello">Hi, {{ user.firstName }}</span>
         <AppNavigation />
+        <ThemeSwitcher />
       </div>
     </div>
   </header>
