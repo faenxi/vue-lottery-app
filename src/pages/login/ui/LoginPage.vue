@@ -3,11 +3,11 @@ import { ref } from 'vue'
 import { useForm } from 'vee-validate'
 import { useRoute, useRouter } from 'vue-router'
 import { BaseButton, FormInput } from '@/shared/ui'
-import { useAuthStore } from '@/stores/auth'
+import { useSessionStore } from '@/entities/session'
 import { getErrorMessage } from '@/shared/lib'
 import { loginSchema } from '@/features/auth'
 
-const auth = useAuthStore()
+const session = useSessionStore()
 const route = useRoute()
 const router = useRouter()
 
@@ -28,7 +28,7 @@ const onSubmit = handleSubmit(async (values) => {
   isSubmitting.value = true
   submitError.value = null
   try {
-    await auth.login(values)
+    await session.login(values)
     await router.replace(getRedirectTarget())
   } catch (e) {
     submitError.value = getErrorMessage(e)

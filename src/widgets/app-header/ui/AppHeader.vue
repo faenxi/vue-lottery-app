@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth'
+import { useSessionStore } from '@/entities/session'
 import AppLogo from './AppLogo.vue'
 import AppNavigation from './AppNavigation.vue'
 
-const auth = useAuthStore()
+const session = useSessionStore()
 </script>
 
 <template>
@@ -11,7 +11,7 @@ const auth = useAuthStore()
     <div class="container app-header__inner">
       <AppLogo />
       <div class="d-flex align-items-center gap-3 flex-wrap">
-        <span v-if="auth.user" class="text-body-secondary small">Hi, {{ auth.user.firstName }}</span>
+        <span v-if="session.user" class="text-body-secondary small">Hi, {{ session.user.firstName }}</span>
         <AppNavigation />
       </div>
     </div>

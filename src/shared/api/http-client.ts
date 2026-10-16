@@ -9,7 +9,7 @@ export class HttpError extends Error {
 }
 
 /**
- * Хуки авторизації. Їх реєструє застосунок (див. src/app/setup-auth.ts),
+ * Хуки авторизації. Їх реєструє застосунок (див. src/app/providers/auth.ts),
  * тому http-клієнт нічого не знає про Pinia чи роутер.
  */
 export interface AuthHandlers {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useUsersStore } from '@/stores/users'
+import { useUsersStore } from '@/entities/user'
 import { useWinnersStore } from '@/features/lottery'
 import type { User } from '@/entities/user'
 import { getErrorMessage } from '@/shared/lib'
@@ -25,7 +25,7 @@ async function loadUser(): Promise<void> {
   isLoading.value = true
   error.value = null
   try {
-    user.value = await users.getUserById(Number(props.id))
+    user.value = await users.fetchUser(Number(props.id))
   } catch (e) {
     user.value = null
     error.value = getErrorMessage(e)

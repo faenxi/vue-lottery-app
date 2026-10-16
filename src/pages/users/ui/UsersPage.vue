@@ -6,7 +6,7 @@ import { WinnersBlock, useWinnersStore } from '@/features/lottery'
 import { SearchBar } from '@/features/user-search'
 import { UserForm, toCreateDto } from '@/features/user-form'
 import { UsersTable } from '@/widgets/users-table'
-import { PAGE_SIZE, useUsersStore } from '@/stores/users'
+import { PAGE_SIZE, useUsersStore } from '@/entities/user'
 import type { User } from '@/entities/user'
 import { getErrorMessage } from '@/shared/lib'
 import { fullName } from '@/entities/user'
@@ -64,7 +64,7 @@ function onFilterByName(value: string): void {
 }
 
 const offset = computed(() => (page.value - 1) * PAGE_SIZE)
-const isDrawDisabled = computed(() => !winners.canDraw(users.items))
+const isDrawDisabled = computed(() => !winners.canDraw(users.users))
 
 // Повідомлення про успішні дії
 const notice = ref<string | null>(null)
@@ -94,7 +94,7 @@ async function createUser(values: UserFormValues): Promise<void> {
   isCreating.value = true
   createError.value = null
   try {
-    const user = await users.create(toCreateDto(values))
+    const user = await users.createUser(toCreateDto(values))
     isCreateOpen.value = false
     showNotice(`User "${fullName(user)}" has been created.`)
     // Нові користувачі показуються на першій сторінці без пошукового фільтра
@@ -124,13 +124,13 @@ async function confirmDelete(): Promise<void> {
   isDeleting.value = true
   deleteError.value = null
   try {
-    await users.remove(user.id)
+    await users.removeUser(user.id)
     // Видалений користувач зникає і з блоку переможців
     winners.remove(user.id)
     isDeleteOpen.value = false
     showNotice(`User "${fullName(user)}" has been deleted.`)
     // Якщо на поточній сторінці нікого не лишилось, повертаємось на попередню
-    if (users.items.length === 0 && page.value > 1) await updateQuery({ page: page.value - 1 })
+    if (users.users.length === 0 && page.value > 1) await updateQuery({ page: page.value - 1 })
   } catch (e) {
     deleteError.value = getErrorMessage(e)
   } finally {
@@ -144,7 +144,7 @@ async function confirmDelete(): Promise<void> {
     <WinnersBlock
       :winners="winners.winners"
       :is-draw-disabled="isDrawDisabled"
-      @draw="winners.draw(users.items)"
+      @draw="winners.draw(users.users)"
       @remove-winner="winners.remove"
     />
 
@@ -165,14 +165,14 @@ async function confirmDelete(): Promise<void> {
           <BaseButton variant="outline-danger" class="btn-sm" @click="loadUsers">Retry</BaseButton>
         </div>
 
-        <div v-else-if="users.isLoading && users.items.length === 0" class="text-center py-5">
+        <div v-else-if="users.isLoading && users.users.length === 0" class="text-center py-5">
           <span class="spinner-border text-primary" role="status" aria-label="Loading" />
         </div>
 
         <template v-else>
           <div :class="{ 'is-loading': users.isLoading }">
-            <UsersTable :users="users.items" :offset="offset" @delete="askDelete" />
-            <p v-if="users.items.length === 0" class="text-center text-body-secondary mt-3 mb-0">No users found.</p>
+            <UsersTable :users="users.users" :offset="offset" @delete="askDelete" />
+            <p v-if="users.users.length === 0" class="text-center text-body-secondary mt-3 mb-0">No users found.</p>
           </div>
           <div class="mt-3">
             <BasePagination v-model:page="pageModel" :page-count="users.pageCount" />

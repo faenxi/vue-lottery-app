@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter, type RouteLocationRaw } from 'vue-router'
 import { BaseButton } from '@/shared/ui'
-import { useAuthStore } from '@/stores/auth'
+import { useSessionStore } from '@/entities/session'
 
 interface NavItem {
   label: string
@@ -16,11 +16,11 @@ const items: NavItem[] = [
   { label: 'Users', to: { name: 'users' } },
 ]
 
-const auth = useAuthStore()
+const session = useSessionStore()
 const router = useRouter()
 
 function logout(): void {
-  auth.logout()
+  session.logout()
   void router.push({ name: 'login' })
 }
 </script>
@@ -33,7 +33,7 @@ function logout(): void {
           {{ item.label }}
         </RouterLink>
       </li>
-      <li v-if="!auth.isAuthenticated" class="nav-item">
+      <li v-if="!session.isAuthenticated" class="nav-item">
         <RouterLink :to="{ name: 'login' }" class="nav-link" active-class="is-active">Login</RouterLink>
       </li>
       <li v-else class="nav-item ms-2">

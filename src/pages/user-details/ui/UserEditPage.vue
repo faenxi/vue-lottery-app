@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { UserForm, toUpdateDto } from '@/features/user-form'
-import { useUsersStore } from '@/stores/users'
+import { useUsersStore } from '@/entities/user'
 import type { User } from '@/entities/user'
 import { getErrorMessage } from '@/shared/lib'
 import type { UserFormValues } from '@/features/user-form'
@@ -35,7 +35,7 @@ async function onSubmit(values: UserFormValues): Promise<void> {
   isSubmitting.value = true
   serverError.value = null
   try {
-    const updated = await users.update(props.user.id, toUpdateDto(values))
+    const updated = await users.updateUser(props.user.id, toUpdateDto(values))
     emit('saved', updated)
   } catch (e) {
     serverError.value = getErrorMessage(e)

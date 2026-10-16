@@ -1,7 +1,8 @@
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { ServiceProvider } from '@/shared/api'
-import type { AuthService, AuthUser, LoginCredentials } from '@/entities/session'
+import type { AuthService } from '../api/auth.service'
+import type { AuthTokens, AuthUser, LoginCredentials } from './types'
 
 const STORAGE_KEY = 'vue-lottery-auth'
 
@@ -35,8 +36,14 @@ function pickAuthUser(source: AuthUser): AuthUser {
   return { id, username, email, firstName, lastName, gender, image }
 }
 
-export const useAuthStore = defineStore('auth', () => {
-  // Відновлення сесії з localStorage при завантаженні застосунку
+/**
+ * Стор сесії: токени, поточний користувач, ознака авторизації.
+ *
+ * Збереження в localStorage реалізоване вручну (loadSession / persist), щоб було що порівняти
+ * з pinia-plugin-persistedstate (див. README, розділ «Збереження стану Pinia»).
+ */
+export const useSessionStore = defineStore('session', () => {
+  // Відновлення сесії з localStorage при створенні стору
   const initial = loadSession()
   const accessToken = ref<string | null>(initial.accessToken)
   const refreshToken = ref<string | null>(initial.refreshToken)
@@ -44,39 +51,41 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => accessToken.value !== null)
 
-  // Збереження сесії через watcher
-  watch(
-    [accessToken, refreshToken, user],
-    () => {
-      try {
-        if (accessToken.value === null) {
-          localStorage.removeItem(STORAGE_KEY)
-          return
-        }
-        const session: PersistedSession = {
-          accessToken: accessToken.value,
-          refreshToken: refreshToken.value,
-          user: user.value,
-        }
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(session))
-      } catch {
-        // localStorage недоступний (приватний режим тощо), працюємо без збереження
+  function persist(): void {
+    try {
+      if (accessToken.value === null) {
+        localStorage.removeItem(STORAGE_KEY)
+        return
       }
-    },
-    { deep: true },
-  )
+      const session: PersistedSession = {
+        accessToken: accessToken.value,
+        refreshToken: refreshToken.value,
+        user: user.value,
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(session))
+    } catch {
+      // localStorage недоступний (приватний режим тощо), працюємо без збереження
+    }
+  }
 
-  async function login(credentials: LoginCredentials): Promise<void> {
-    const response = await authService().login(credentials)
-    accessToken.value = response.accessToken
-    refreshToken.value = response.refreshToken
-    user.value = pickAuthUser(response)
+  /** Зберігає токени (і, за потреби, користувача) у сторі та localStorage. */
+  function setSession(tokens: AuthTokens, nextUser?: AuthUser): void {
+    accessToken.value = tokens.accessToken
+    refreshToken.value = tokens.refreshToken
+    if (nextUser) user.value = pickAuthUser(nextUser)
+    persist()
   }
 
   function clearSession(): void {
     accessToken.value = null
     refreshToken.value = null
     user.value = null
+    persist()
+  }
+
+  async function login(credentials: LoginCredentials): Promise<void> {
+    const { accessToken: access, refreshToken: refresh, ...profile } = await authService().login(credentials)
+    setSession({ accessToken: access, refreshToken: refresh }, profile)
   }
 
   function logout(): void {
@@ -84,8 +93,8 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function fetchCurrentUser(): Promise<void> {
-    const me = await authService().getCurrentUser()
-    user.value = pickAuthUser(me)
+    user.value = pickAuthUser(await authService().getCurrentUser())
+    persist()
   }
 
   // Якщо кілька запитів одночасно отримали 401, оновлюємо токен лише один раз
@@ -98,8 +107,7 @@ export const useAuthStore = defineStore('auth', () => {
     refreshPromise ??= authService()
       .refresh(currentRefreshToken)
       .then((tokens) => {
-        accessToken.value = tokens.accessToken
-        refreshToken.value = tokens.refreshToken
+        setSession(tokens)
         return tokens.accessToken
       })
       .catch(() => null)
@@ -115,9 +123,10 @@ export const useAuthStore = defineStore('auth', () => {
     refreshToken,
     user,
     isAuthenticated,
+    setSession,
+    clearSession,
     login,
     logout,
-    clearSession,
     fetchCurrentUser,
     refreshAccessToken,
   }

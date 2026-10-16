@@ -1,9 +1,10 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { HttpError, ServiceProvider } from '@/shared/api'
-import type { CreateUserDto, UpdateUserDto, User, UserService } from '@/entities/user'
 import { getErrorMessage } from '@/shared/lib'
-import { fullName } from '@/entities/user'
+import type { UserService } from '../api/user.service'
+import { fullName } from '../lib/full-name'
+import type { CreateUserDto, UpdateUserDto, User } from './types'
 
 export const PAGE_SIZE = 10
 
@@ -42,7 +43,8 @@ export const useUsersStore = defineStore('users', () => {
     createdUsers.value.filter((user) => matchesQuery(user, currentQuery.value)),
   )
 
-  const items = computed<User[]>(() => {
+  /** Список користувачів поточної сторінки з урахуванням локальних змін. */
+  const users = computed<User[]>(() => {
     const deletedIds = new Set(deletedUsers.value.map((user) => user.id))
     const fromServer = serverItems.value
       .filter((user) => !deletedIds.has(user.id))
@@ -87,7 +89,7 @@ export const useUsersStore = defineStore('users', () => {
     }
   }
 
-  async function getUserById(id: number): Promise<User> {
+  async function fetchUser(id: number): Promise<User> {
     const created = createdUsers.value.find((user) => user.id === id)
     if (created) return created
     if (deletedUsers.value.some((user) => user.id === id)) {
@@ -97,7 +99,7 @@ export const useUsersStore = defineStore('users', () => {
     return editedUsers.value[id] ?? user
   }
 
-  async function create(dto: CreateUserDto): Promise<User> {
+  async function createUser(dto: CreateUserDto): Promise<User> {
     const response = await userService().create(dto)
     // DummyJSON щоразу повертає той самий id, тому гарантуємо унікальність локально
     const usedIds = new Set(createdUsers.value.map((user) => user.id))
@@ -109,7 +111,7 @@ export const useUsersStore = defineStore('users', () => {
     return user
   }
 
-  async function update(id: number, dto: UpdateUserDto): Promise<User> {
+  async function updateUser(id: number, dto: UpdateUserDto): Promise<User> {
     const existingCreated = createdUsers.value.find((user) => user.id === id)
     if (existingCreated) {
       // Користувача створено локально, на сервері його не існує: оновлюємо лише локально
@@ -125,7 +127,7 @@ export const useUsersStore = defineStore('users', () => {
     return updated
   }
 
-  async function remove(id: number): Promise<void> {
+  async function removeUser(id: number): Promise<void> {
     const isLocal = createdUsers.value.some((user) => user.id === id)
     if (isLocal) {
       createdUsers.value = createdUsers.value.filter((user) => user.id !== id)
@@ -141,7 +143,7 @@ export const useUsersStore = defineStore('users', () => {
   }
 
   return {
-    items,
+    users,
     total,
     pageCount,
     currentPage,
@@ -150,9 +152,9 @@ export const useUsersStore = defineStore('users', () => {
     isLoading,
     error,
     fetchUsers,
-    getUserById,
-    create,
-    update,
-    remove,
+    fetchUser,
+    createUser,
+    updateUser,
+    removeUser,
   }
 })
