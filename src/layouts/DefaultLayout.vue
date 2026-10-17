@@ -1,4 +1,6 @@
-<script setup lang="ts">
+git status
+git checkout feature/routing
+git checkout -b feature/fsd<script setup lang="ts">
 import AppHeader from '@/components/layout/AppHeader.vue'
 </script>
 
